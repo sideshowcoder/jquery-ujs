@@ -116,6 +116,17 @@
           method = element.attr('method');
           url = element.attr('action');
           data = element.serializeArray();
+          if ($.ajaxSettings && $.ajaxSettings.data) {
+            $.each(($.ajaxSettings && $.ajaxSettings.data), function(key, value) {
+              var boolFlag = true;
+              $.each(data, function(arrayIndex, arrayObject) {
+                if (arrayObject.name == key) {
+                 boolFlag = false;
+                }
+              });
+              if (boolFlag == true) { data.push({'name':key, 'value':value}) };
+            });
+          }
           // memoized value from clicked submit button
           var button = element.data('ujs:submit-button');
           if (button) {
@@ -127,10 +138,20 @@
           url = element.data('url');
           data = element.serialize();
           if (element.data('params')) data = data + "&" + element.data('params');
+          if ($.ajaxSettings && $.ajaxSettings.data) {
+            $.each(($.ajaxSettings && $.ajaxSettings.data), function(key, value) {
+              if ((data.indexOf("&" + key + "=") == -1) && (data.indexOf(key + "=") != 0)) { data = data + "&" + key + "=" + value};
+            });
+          }
         } else {
           method = element.data('method');
           url = rails.href(element);
           data = element.data('params') || null;
+          if ($.ajaxSettings && $.ajaxSettings.data) {
+            $.each(($.ajaxSettings && $.ajaxSettings.data), function(key, value) {
+              if (!(data[key])) { data[key] = value };
+            });
+          }
         }
 
         options = {
